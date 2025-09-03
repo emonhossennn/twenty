@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { type Query, type QueryOptions } from '@ptc-org/nestjs-query-core';
@@ -58,6 +58,8 @@ import { type CreateObjectInput } from './dtos/create-object.input';
 
 @Injectable()
 export class ObjectMetadataService extends TypeOrmQueryService<ObjectMetadataEntity> {
+  private readonly logger = new Logger(ObjectMetadataService.name);
+
   constructor(
     @InjectRepository(ObjectMetadataEntity, 'core')
     private readonly objectMetadataRepository: Repository<ObjectMetadataEntity>,
@@ -85,12 +87,11 @@ export class ObjectMetadataService extends TypeOrmQueryService<ObjectMetadataEnt
   ): Promise<ObjectMetadataEntity[]> {
     const start = performance.now();
 
-    const result = super.query(query, opts);
+    const result = await super.query(query, opts);
 
     const end = performance.now();
 
-    // eslint-disable-next-line no-console
-    console.log(`metadata query time: ${end - start} ms`);
+    this.logger.debug(`metadata query time: ${end - start} ms`);
 
     return result;
   }
